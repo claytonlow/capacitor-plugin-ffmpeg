@@ -11,9 +11,13 @@ import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import java.util.List;
+import android.util.Log;
+
 
 @NativePlugin
 public class FFMpeg extends Plugin {
+    private static final String TAG = "FFMpeg";
 
     public void load() {
         // Called when the plugin is first constructed in the bridge
@@ -55,9 +59,9 @@ public class FFMpeg extends Plugin {
         // Return code for completed sessions. Will be null if session is still running or ends with a failure
         ReturnCode returnCode = session.getReturnCode();
 
-        Date startTime = session.getStartTime();
-        Date endTime = session.getEndTime();
-        long duration = session.getDuration();
+        // Date startTime = session.getStartTime();
+        // Date endTime = session.getEndTime();
+        // long duration = session.getDuration();
 
         // Console output generated for this execution
         String output = session.getOutput();
