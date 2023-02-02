@@ -1,5 +1,6 @@
 
   <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
       package="dev.thesayyn.ffmpeg.capacitorpluginffmpeg">
       <uses-sdk tools:overrideLibrary="dev.thesayyn.ffmpeg.capacitorpluginffmpeg"/>
 
