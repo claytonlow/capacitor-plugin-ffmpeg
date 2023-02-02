@@ -11,26 +11,8 @@ import com.getcapacitor.PluginMethod;
 @NativePlugin
 public class FFMpeg extends Plugin {
 
-    public FFMpeg() {
-        FFmpegKitConfig.enableStatisticsCallback(statistics -> {
-            JSObject stats = new JSObject();
-            stats.put("execution_id", statistics.getExecutionId());
-            stats.put("bitrate", statistics.getBitrate());
-            stats.put("size", statistics.getSize());
-            stats.put("speed", statistics.getSpeed());
-            stats.put("time", statistics.getTime());
-            stats.put("video_fps", statistics.getVideoFps());
-            stats.put("video_frame_number", statistics.getVideoFrameNumber());
-            stats.put("video_quality", statistics.getVideoQuality());
-            notifyListeners("statistic", stats);
-        });
-        FFmpegKitConfig.enableLogCallback(message -> {
-            JSObject entry = new JSObject();
-            entry.put("execution_id", message.getExecutionId());
-            entry.put("level", message.getLevel());
-            entry.put("text", message.getText());
-            notifyListeners("message", entry);
-        });
+    public void load() {
+        // Called when the plugin is first constructed in the bridge
     }
 
     @PluginMethod
@@ -52,42 +34,55 @@ public class FFMpeg extends Plugin {
         //     }
         // });
 
-        FFmpegKit.executeAsync(args, new FFmpegSessionCompleteCallback() {
+        FFmpegSession session = FFmpegKit.execute(args);
 
-            @Override
-            public void apply(FFmpegSession session) {
-                SessionState state = session.getState();
-                ReturnCode returnCode = session.getReturnCode();
-        
-                // CALLED WHEN SESSION IS EXECUTED
-        
-                if (returnCode == FFmpegKitConfig.RETURN_CODE_SUCCESS) {
-                    JSObject result = new JSObject();
-                    result.put("execution_id", executionId);
-                    call.success(result);
-                } else {
-                    call.error("process has failed.", String.valueOf(returnCode), new Exception("process has failed."));
-                }
-                Log.d(TAG, String.format("FFmpeg process exited with state %s and rc %s.%s", state, returnCode, session.getFailStackTrace()));
-            }
-        }, new LogCallback() {
-        
-            @Override
-            public void apply(com.arthenica.ffmpegkit.Log log) {
-        
-                // CALLED WHEN SESSION PRINTS LOGS
-        
-            }
-        }, new StatisticsCallback() {
-        
-            @Override
-            public void apply(Statistics statistics) {
-        
-                // CALLED WHEN SESSION GENERATES STATISTICS
-        
-            }
-        });
-        
+        // Unique session id created for this execution
+        long sessionId = session.getSessionId();
 
+        // Command arguments as a single string
+        String command = session.getCommand();
+
+        // Command arguments
+        String[] arguments = session.getArguments();
+
+        // State of the execution. Shows whether it is still running or completed
+        SessionState state = session.getState();
+
+        // Return code for completed sessions. Will be null if session is still running or ends with a failure
+        ReturnCode returnCode = session.getReturnCode();
+
+        Date startTime = session.getStartTime();
+        Date endTime = session.getEndTime();
+        long duration = session.getDuration();
+
+        // Console output generated for this execution
+        String output = session.getOutput();
+
+        // The stack trace if FFmpegKit fails to run a command
+        String failStackTrace = session.getFailStackTrace();
+
+        // The list of logs generated for this execution
+        List<com.arthenica.ffmpegkit.Log> logs = session.getLogs();
+
+        // The list of statistics generated for this execution
+        List<Statistics> statistics = session.getStatistics();
+
+        
+        if (ReturnCode.isSuccess(returnCode)) {
+            Log.d(TAG, String.format("WE GOOOOOOOOOD state %s and rc %s.%s", session.getState(), session.getReturnCode(), session.getFailStackTrace()));
+            // SUCCESS
+            JSObject result = new JSObject();
+            result.put("execution_id", "asdfadsf");
+            call.success(result);
+        } else if (ReturnCode.isCancel(returnCode)) {
+        
+            // CANCEL
+        
+        } else {
+        
+            // FAILURE
+            Log.d(TAG, String.format("Command failed with state %s and rc %s.%s", session.getState(), session.getReturnCode(), session.getFailStackTrace()));
+        
+        }
     }
 }
